@@ -983,7 +983,4 @@ client.on("messageDelete", message=>{
 
 
 // TOKEN
-console.log("TOKEN tồn tại:", !!process.env.TOKEN);
-console.log("Độ dài token:", process.env.TOKEN?.length);
-console.log("TOKEN:", process.env.TOKEN?.slice(0, 10));
 client.login(process.env.TOKEN);
