@@ -984,4 +984,4 @@ client.on("messageDelete", message=>{
 
 // TOKEN
 
-client.login("MTUzMTE5MzEzNDAwMjg2ODI1NQ.GGkGP0.F3JjvT5w0YqNvWBWY4xEFT7XvXW5SKrXOfnZik");
+client.login("process.env.TOKEN");
