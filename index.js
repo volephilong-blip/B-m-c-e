@@ -841,23 +841,25 @@ if(command === "unmute") {
 
 }
 
-	
+
+
 // =====================
 // STOP NHẠC
 // =====================
 
-const data = voiceData.get(message.guild.id);
+if(command === "stop") {
 
-if(!data)
-    return message.reply("❌ Không có nhạc đang phát");
+    const data = voiceData.get(message.guild.id);
 
-
-data.player.stop();
-
-
+    if(!data) {
+        return message.reply("❌ Không có nhạc đang phát!");
+    }
 
 
-    message.reply("⏹ Đã dừng nhạc!");
+    data.player.stop();
+
+
+    return message.reply("⏹ Đã dừng nhạc!");
 
 }
 	
@@ -868,7 +870,11 @@ data.player.stop();
 
 if(command === "play") {
 
-    if(!connection) {
+
+    const data = voiceData.get(message.guild.id);
+
+
+    if(!data) {
         return message.reply("❌ Bot chưa ở voice!");
     }
 
@@ -881,96 +887,129 @@ if(command === "play") {
     }
 
 
+
     try {
+
 
         // Spotify playlist
 
         if(url.includes("spotify.com/playlist")) {
 
 
-            const playlistId = url
-                .split("playlist/")[1]
-                .split("?")[0];
-
-
             const playlist = await play.spotify(url);
 
-if(!playlist || !playlist.fetched_tracks.length) {
-    return message.reply("❌ Playlist không có bài!");
-}
 
-message.reply(
-    `🎶 Đang tải playlist: ${playlist.title} (${playlist.fetched_tracks.length} bài)`
-);
+            if(!playlist || !playlist.fetched_tracks.length) {
 
+                return message.reply(
+                    "❌ Playlist không có bài!"
+                );
 
-for(const track of playlist.fetched_tracks) {
-
-    const searchText =
-        `${track.name} ${track.artists[0].name}`;
+            }
 
 
-    const result = await play.search(
-        searchText,
-        {
-            limit: 1
+
+            message.reply(
+                `🎶 Đang tải playlist: ${playlist.title} (${playlist.fetched_tracks.length} bài)`
+            );
+
+
+
+            for(const track of playlist.fetched_tracks) {
+
+
+                const searchText =
+                    `${track.name} ${track.artists[0].name}`;
+
+
+
+                const result = await play.search(
+                    searchText,
+                    {
+                        limit:1
+                    }
+                );
+
+
+
+                if(result.length) {
+
+                    musicQueue.push({
+
+                        name: searchText,
+
+                        url: result[0].url
+
+                    });
+
+                }
+
+
+            }
+
+
+
+            if(!isPlaying) {
+
+                playNext(message);
+
+            }
+
+
+            return;
+
+
         }
-    );
 
 
-    if(result.length) {
+
+        // Link Youtube thường
+
+
+        const info = await play.video_info(url);
+
 
         musicQueue.push({
-            name: searchText,
-            url: result[0].url
+
+            name: info.video_details.title,
+
+            url:url
+
         });
+
+
+
+        message.reply(
+            `🎵 Đã thêm: **${info.video_details.title}**`
+        );
+
+
+
+        if(!isPlaying) {
+
+            playNext(message);
+
+        }
+
+
+
+    } catch(err) {
+
+
+        console.log(
+            "PLAY ERROR:",
+            err
+        );
+
+
+        message.reply(
+            "❌ Không phát được nhạc!"
+        );
+
 
     }
 
 }
-
-
-if(!isPlaying) {
-    playNext(message);
-}
-
-return;
-
-
-            console.log(
-                "Số bài:",
-                data.body.items.length
-            );
-
-
-            return message.reply(
-                `🎶 Đã đọc playlist: ${data.body.items.length} bài`
-            );
-
-
-        }
-
-
-        return message.reply("⏳ Đây chưa phải playlist Spotify");
-
-
-    }     catch(err) {
-
-    console.log(
-        "SPOTIFY ERROR FULL:",
-        err
-    );
-
-
-    return message.reply(
-        "❌ Không đọc được playlist Spotify!"
-    );
-
-}
-
-}
-
-});
 
 
 
