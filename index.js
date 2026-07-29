@@ -84,7 +84,7 @@ play.setToken({
     }
 });
 
-
+const player = createAudioPlayer();
 const voiceData = new Map();
 
 let pingLoop = null;
