@@ -84,40 +84,11 @@ play.setToken({
     }
 });
 
-const player = createAudioPlayer();
 const voiceData = new Map();
 
 let pingLoop = null;
 
 const deletedMessages = new Map();
-
-
-
-player.on(AudioPlayerStatus.Playing, () => {
-    console.log("🔊 Đang phát âm thanh");
-});
-
-
-player.on(AudioPlayerStatus.Idle, () => {
-    console.log("⏹ Đã phát xong");
-});
-
-
-player.on("error", err => {
-    console.log("PLAYER ERROR:", err);
-});
-
-player.on(AudioPlayerStatus.Idle, () => {
-
-    if(isPlaying) {
-
-        setTimeout(() => {
-            playNext(lastMessage);
-        },1000);
-
-    }
-
-});
 
 
 
@@ -588,62 +559,72 @@ if(command === "join") {
 
 
 
-    // =====================
-    // SAY VOICE
-    // =====================
+   // =====================
+// SAY VOICE
+// =====================
 
-    if(command === "say") {
-
-
-        if(!connection)
-            return message.reply("❌ Bot chưa ở voice");
+if(command === "say") {
 
 
-        const text = args.join(" ");
+    const data = voiceData.get(message.guild.id);
 
 
-        if(!text)
-            return message.reply("❌ Nhập nội dung");
+    if(!data) {
+        return message.reply("❌ Bot chưa ở voice!");
+    }
 
 
-
-        try{
-
-
-            const file = await createVoice(text);
+    const text = args.join(" ");
 
 
+    if(!text) {
+        return message.reply("❌ Nhập nội dung cần đọc!");
+    }
 
-            const resource = createAudioResource(
-                file,
-                {
-                    inputType: StreamType.Arbitrary
-                }
-            );
+
+    try {
+
+
+        const file = await createVoice(text);
 
 
 
-            const data = voiceData.get(message.guild.id);
-
-if (!data) return;
-
-data.player.play(resource);
-
-
-
-            return message.reply(
-                "🎤 Đã đọc: " + text
-            );
+        const resource = createAudioResource(
+            file,
+            {
+                inputType: StreamType.Arbitrary
+            }
+        );
 
 
 
-        }catch(err){
+        data.player.play(resource);
 
-            console.log("SAY ERROR:",err);
 
-        }
+
+        return message.reply(
+            "🎤 Đã đọc: " + text
+        );
+
+
+
+    } catch(err) {
+
+
+        console.log(
+            "SAY ERROR:",
+            err
+        );
+
+
+        return message.reply(
+            "❌ Lỗi khi tạo giọng nói!"
+        );
+
 
     }
+
+}
 
 
 
@@ -1010,6 +991,8 @@ if(command === "play") {
     }
 
 }
+
+});
 
 
 
