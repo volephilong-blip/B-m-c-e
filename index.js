@@ -233,11 +233,11 @@ client.on("messageCreate", async message => {
 
         "bốm cảe":"j",
 
-        "spicy me":"kêu con ngục lên gặp chị",
+        "spicy me":"kêu con ngục <@1312612784600645693> lên gặp chị",
 
         "phát":"<@1405032456356106342>",
 
-        "ngu":"ngu ngu ngu"
+        "ngu":"ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu ngu "
 
     };
 
