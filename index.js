@@ -145,39 +145,33 @@ client.once("clientReady", () => {
         return;
     }
 
-const player = createAudioPlayer();
 
-const connection = joinVoiceChannel({
-
-    channelId: voice.id,
-    guildId: guild.id,
-    adapterCreator: guild.voiceAdapterCreator,
-    selfMute:false,
-    selfDeaf:false
-
-});
-
-connection.subscribe(player);
+    const player = createAudioPlayer();
 
 
-voiceData.set(guild.id, {
-    connection,
-    player
-});
+    const connection = joinVoiceChannel({
+
+        channelId: voice.id,
+        guildId: guild.id,
+        adapterCreator: guild.voiceAdapterCreator,
+        selfMute:false,
+        selfDeaf:false
+
+    });
+
+
+    connection.subscribe(player);
+
+
+    voiceData.set(guild.id, {
+        connection,
+        player
+    });
 
 
     console.log("🔊 Bot đã vào voice");
 
 });
-
-async function playNext(message) {
-
-    if(musicQueue.length === 0) {
-
-        isPlaying = false;
-        return;
-
-    }
 
 
     isPlaying = true;
@@ -276,46 +270,50 @@ client.on("messageCreate", async message => {
 
 
 
+// JOIN VOICE
 
-    // JOIN VOICE
+if(command === "join") {
 
-    if(command === "join") {
+    const channel = message.member.voice.channel;
 
-
-        const channel = message.member.voice.channel;
-
-
-        if(!channel)
-            return message.reply("❌ Vào voice trước!");
+    if(!channel)
+        return message.reply("❌ Vào voice trước!");
 
 
+    // Nếu bot đã có dữ liệu voice trong server này
+    const oldData = voiceData.get(message.guild.id);
 
- const player = createAudioPlayer();
-
-const connection = joinVoiceChannel({
-
-    channelId: channel.id,
-    guildId: message.guild.id,
-    adapterCreator: message.guild.voiceAdapterCreator,
-    selfMute:false,
-    selfDeaf:false
-
-});
-
-
-connection.subscribe(player);
-
-
-voiceData.set(message.guild.id, {
-    connection,
-    player
-});
-
-
-        return message.reply("✅ Bot đã vào voice");
-
+    if(oldData) {
+        return message.reply("✅ Bot đã ở trong voice rồi!");
     }
 
+
+    const player = createAudioPlayer();
+
+
+    const connection = joinVoiceChannel({
+
+        channelId: channel.id,
+        guildId: message.guild.id,
+        adapterCreator: message.guild.voiceAdapterCreator,
+        selfMute:false,
+        selfDeaf:false
+
+    });
+
+
+    connection.subscribe(player);
+
+
+    voiceData.set(message.guild.id, {
+        connection,
+        player
+    });
+
+
+    return message.reply("✅ Bot đã vào voice");
+
+}
 
 
 
