@@ -215,7 +215,6 @@ async function playNext(message) {
 
 if(!data)
     return message.reply("❌ Bot chưa ở voice");
-    }
 
 
     data.player.play(resource);
