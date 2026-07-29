@@ -85,9 +85,8 @@ play.setToken({
 });
 
 
-const player = createAudioPlayer();
+const voiceData = new Map();
 
-let connection = null;
 let pingLoop = null;
 
 const deletedMessages = new Map();
@@ -146,19 +145,25 @@ client.once("clientReady", () => {
         return;
     }
 
+const player = createAudioPlayer();
 
-    connection = joinVoiceChannel({
+const connection = joinVoiceChannel({
 
-        channelId: voice.id,
-        guildId: guild.id,
-        adapterCreator: guild.voiceAdapterCreator,
-        selfMute:false,
-        selfDeaf:false
+    channelId: voice.id,
+    guildId: guild.id,
+    adapterCreator: guild.voiceAdapterCreator,
+    selfMute:false,
+    selfDeaf:false
 
-    });
+});
+
+connection.subscribe(player);
 
 
-    connection.subscribe(player);
+voiceData.set(guild.id, {
+    connection,
+    player
+});
 
 
     console.log("🔊 Bot đã vào voice");
@@ -285,19 +290,26 @@ client.on("messageCreate", async message => {
 
 
 
-        connection = joinVoiceChannel({
+ const player = createAudioPlayer();
 
-            channelId: channel.id,
-            guildId: message.guild.id,
-            adapterCreator: message.guild.voiceAdapterCreator,
-            selfMute:false,
-            selfDeaf:false
+const connection = joinVoiceChannel({
 
-        });
+    channelId: channel.id,
+    guildId: message.guild.id,
+    adapterCreator: message.guild.voiceAdapterCreator,
+    selfMute:false,
+    selfDeaf:false
+
+});
 
 
+connection.subscribe(player);
 
-        connection.subscribe(player);
+
+voiceData.set(message.guild.id, {
+    connection,
+    player
+});
 
 
         return message.reply("✅ Bot đã vào voice");
@@ -599,7 +611,11 @@ client.on("messageCreate", async message => {
 
 
 
-            player.play(resource);
+            const data = voiceData.get(message.guild.id);
+
+if (!data) return;
+
+data.player.play(resource);
 
 
 
