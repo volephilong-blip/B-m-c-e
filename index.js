@@ -177,8 +177,18 @@ client.once("clientReady", () => {
     isPlaying = true;
 
 
-    const song = musicQueue.shift();
+async function playNext(message) {
 
+    if(musicQueue.length === 0) {
+
+        isPlaying = false;
+        return;
+
+    }
+
+    isPlaying = true;
+
+    const song = musicQueue.shift();
 
     const ytdlp = spawn(
         "yt-dlp.exe",
@@ -201,16 +211,21 @@ client.once("clientReady", () => {
     );
 
 
-    player.play(resource);
+    const data = voiceData.get(message.guild.id);
+
+if(!data)
+    return message.reply("❌ Bot chưa ở voice");
+    }
 
 
-    connection.subscribe(player);
+    data.player.play(resource);
+
+    data.connection.subscribe(data.player);
 
 
     message.channel.send(
         `🎵 Đang phát: **${song.name}**`
     );
-
 
 }
 
@@ -832,14 +847,15 @@ if(command === "unmute") {
 // STOP NHẠC
 // =====================
 
-if(command === "stop") {
+const data = voiceData.get(message.guild.id);
 
-    if(!player) {
-        return message.reply("❌ Không có nhạc đang phát!");
-    }
+if(!data)
+    return message.reply("❌ Không có nhạc đang phát");
 
 
-    player.stop();
+data.player.stop();
+
+
 
 
     message.reply("⏹ Đã dừng nhạc!");
